@@ -16,8 +16,16 @@ module.exports =
     @subscriptions.add atom.workspace.observeTextEditors (editor) =>
       @initiEditor(editor)
 
+    @subscriptions.add atom.workspace.onDidChangeActivePaneItem (item) =>
+      if atom.workspace.isTextEditor(item)
+        @refresh(item)
+
   initiEditor: (editor) ->
-    editor.addGutter(name: 'relative-line-numbers2')
+    console.log editor.getPath()
+    # default line-number gutter priority is 0
+    # So setting priority=1 place relative-line-numbers2 gutter on just
+    # right of line-number guthter.
+    editor.addGutter(name: 'relative-line-numbers2', priority: 1)
     @subscriptions.add editor.onDidChangeCursorPosition =>
       @refresh(editor)
 
@@ -25,7 +33,7 @@ module.exports =
     if @markersByEditor.has(editor)
       for marker in @markersByEditor.get(editor)
         marker.destroy()
-       @markersByEditor.delete(editor)
+      @markersByEditor.delete(editor)
 
     selection = editor.getLastSelection()
     [startRow, endRow] = selection.getBufferRowRange()
@@ -47,4 +55,10 @@ module.exports =
     @markersByEditor.set(editor, markers)
 
   deactivate: ->
+    for editor in atom.workspace.getTextEditors()
+      editor.gutterWithName('relative-line-numbers2')?.destroy()
+    @markersByEditor.forEach (markers) ->
+      for marker in markers
+        marker.destroy()
+    @markersByEditor.clear()
     @subscriptions.dispose()
