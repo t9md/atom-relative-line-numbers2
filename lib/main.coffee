@@ -1,9 +1,10 @@
 {CompositeDisposable} = require 'atom'
 settings = require './settings'
 
-itemForRow = (row) ->
+itemForRow = (rowText) ->
+  # String(row).length
   item = document.createElement('span')
-  item.textContent = row
+  item.textContent = rowText
   item
 
 module.exports =
@@ -21,11 +22,11 @@ module.exports =
         @refresh(item)
 
   initiEditor: (editor) ->
-    console.log editor.getPath()
     # default line-number gutter priority is 0
     # So setting priority=1 place relative-line-numbers2 gutter on just
     # right of line-number guthter.
     editor.addGutter(name: 'relative-line-numbers2', priority: 1)
+    # editor.addGutter(name: 'relative-line-numbers2')
     @subscriptions.add editor.onDidChangeCursorPosition =>
       @refresh(editor)
 
@@ -44,13 +45,24 @@ module.exports =
 
     gutter = editor.gutterWithName('relative-line-numbers2')
     markers = []
+    # # if softWrapped
+    # #   lineNumber = "•"
+    # # else
+    #   lineNumber = (bufferRow + 1).toString()
+    #   padding = _.multiplyString("\u00a0", maxLineNumberDigits - lineNumber.length)
+
+
+    maxLineNumberWidth = editor.getLineCount().toString().length
     for row in [0..editor.getLastBufferRow()]
-      relativeRow = Math.abs(row - currentRow)
+      relativeRow = Math.abs(row - currentRow).toString()
+      # padding = _.multiplyString("\u00a0", maxLineNumberWidth - relativeRow.length)
+      padding = "\u00a0".repeat(maxLineNumberWidth - relativeRow.length)
+
       marker = editor.markBufferPosition([row, 0])
       markers.push(marker)
       gutter.decorateMarker marker, {
         class: "relative-line-numbers2-row"
-        item: itemForRow(relativeRow)
+        item: itemForRow(padding + relativeRow)
       }
     @markersByEditor.set(editor, markers)
 
