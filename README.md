@@ -2,6 +2,7 @@
 
 Show relative line number on gutter.  
 Code is not directly based on existing package, the name `2` is just to avoid scope/naming confusion.  
+Since there is existing relative-line-numbers package.  
 
 # Similar project.
 
