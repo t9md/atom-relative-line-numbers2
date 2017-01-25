@@ -1,3 +1,6 @@
+# DONT USE THIS
+# NOT MAINTAINED AT ALL( JUST WANTED DO SOME EXPERIMENT )
+
 # relative-line-numbers2
 
 Show relative line number on gutter.  
